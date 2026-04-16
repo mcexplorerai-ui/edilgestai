@@ -1,0 +1,129 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email" },
+        "displayName": { "type": "string", "description": "User full name" },
+        "role": { "type": "string", "enum": ["admin", "investor", "technician", "contractor"], "description": "User role" },
+        "plan": { "type": "string", "enum": ["starter", "pro", "enterprise"], "description": "Subscription plan" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "role", "plan"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "A real estate operation / construction site",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "description": "Project name (e.g. Via Garibaldi 118)" },
+        "address": { "type": "string" },
+        "ownerId": { "type": "string", "description": "UID of the investor/owner" },
+        "memberIds": { "type": "array", "items": { "type": "string" }, "description": "List of UIDs with access" },
+        "status": { "type": "string", "enum": ["planning", "active", "completed", "on-hold"] },
+        "totalBudget": { "type": "number" },
+        "estimatedMargin": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "ownerId", "memberIds", "status"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A specific work item in a project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "workDetail": { "type": "string" },
+        "status": { "type": "string", "enum": ["todo", "in-progress", "blocked", "done"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "quoteUrl": { "type": "string" },
+        "billOfQuantitiesUrl": { "type": "string" },
+        "paymentUrl": { "type": "string" },
+        "agreements": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "assignedTo": { "type": "string", "description": "UID of the assigned user" },
+        "estimatedCost": { "type": "number" },
+        "actualCost": { "type": "number" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "title", "status", "priority"]
+    },
+    "Membership": {
+      "title": "Membership",
+      "description": "Links a user to a project with a specific role",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "userId": { "type": "string" },
+        "role": { "type": "string", "enum": ["owner", "editor", "viewer"] }
+      },
+      "required": ["projectId", "userId", "role"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A chat room within a project",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "projectId": { "type": "string" },
+        "name": { "type": "string", "description": "Optional name for group chats" },
+        "participantIds": { "type": "array", "items": { "type": "string" }, "description": "UIDs of participants" },
+        "isGroup": { "type": "boolean" },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "participantIds", "isGroup", "createdAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A message sent in a conversation",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["conversationId", "senderId", "senderName", "text", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification for a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "projectId": { "type": "string" },
+        "taskId": { "type": "string" },
+        "read": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["info", "success", "warning", "error"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message", "read", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "User", "description": "User profiles" },
+    "/projects/{projectId}": { "schema": "Project", "description": "Project details" },
+    "/projects/{projectId}/tasks/{taskId}": { "schema": "Task", "description": "Tasks within a project" },
+    "/projects/{projectId}/conversations/{conversationId}": { "schema": "Conversation", "description": "Conversations within a project" },
+    "/projects/{projectId}/conversations/{conversationId}/messages/{messageId}": { "schema": "ChatMessage", "description": "Messages in a conversation" },
+    "/memberships/{membershipId}": { "schema": "Membership", "description": "Project access control" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "User notifications" }
+  }
+}
