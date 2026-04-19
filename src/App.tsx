@@ -82,6 +82,7 @@ import { auth, db, googleProvider, handleFirestoreError, OperationType, storage,
 // ref e getDownloadURL sono ora esportati da ./firebase — NON reimportare da firebase/storage
 import { Project, Task, UserProfile, SubscriptionPlan, ProjectStatus, TaskStatus, TaskPriority, TaskCategory, ProjectDocument, DocumentType, Membership, ChatMessage, Conversation, Notification, TaskAttachment } from './types';
 import { FileAttacher, type AttachedFile } from './components/FileAttacher';
+import { QuoteAnalyzer } from './components/QuoteAnalyzer';
 
 // --- Constants & Mappings ---
 const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
@@ -2289,7 +2290,7 @@ function ProjectDetail({
   const [members, setMembers] = useState<Membership[]>([]);
   const [documents, setDocuments] = useState<ProjectDocument[]>([]);
   
-  const [activeTab, setActiveTab] = useState<'tasks' | 'team' | 'chat' | 'documents'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'team' | 'chat' | 'documents' | 'quotes'>('tasks');
   
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -2815,8 +2816,9 @@ function ProjectDetail({
       {/* Tabs */}
       <div className="flex border-b border-zinc-200 overflow-x-auto no-scrollbar -mx-6 px-6 scroll-smooth">
         {[
-          { id: 'tasks', label: 'Attività', icon: CheckSquare },
+          { id: 'tasks', label: 'Attivita', icon: CheckSquare },
           { id: 'documents', label: 'Documenti', icon: FolderOpen },
+          { id: 'quotes', label: 'Preventivi', icon: Scale },
           { id: 'team', label: 'Team', fullLabel: 'Team e Professionisti', icon: Users },
           { id: 'chat', label: 'Chat', icon: MessageSquare },
         ].map(tab => (
@@ -3155,6 +3157,11 @@ function ProjectDetail({
               </div>
             )}
           </div>
+        )}
+
+
+        {activeTab === 'quotes' && (
+          <QuoteAnalyzer projectId={project.id} userId={user?.uid || ''} />
         )}
 
         {activeTab === 'team' && (
